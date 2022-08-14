@@ -1,13 +1,36 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
+import connect from './mongo.connect';
+import UserModel from './models/user.model';
+
 
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT;
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server');
+connect();
+
+const port = process.env.PORT;
+app.get('/', async (req: Request, res: Response) => {
+  const user = new UserModel({
+    firstName: 'Bill',
+    email: 'bill@initech.com',
+    lastName: 'Gates',
+    gender: 'male',
+    address: {
+      street: 'Del inca',
+      city: 'las condes',
+      postCode: 7550000,
+    },
+  });
+  await user.save();
+  res.send({ status: 'ok' });
 });
 
 app.listen(port, () => {
